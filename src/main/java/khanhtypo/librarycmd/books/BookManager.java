@@ -90,7 +90,7 @@ public final class BookManager {
 
     @Nullable
     public static Book getBookById(int id) {
-        return getBooksCount() >= id ? null : getAllBooks().get(id);
+        return id >= getBooksCount() ? null : getAllBooks().get(id);
     }
 
     @Nullable

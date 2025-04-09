@@ -145,8 +145,10 @@ public interface ILibrarianCommands extends ICommand {
                     str -> "Your input is not a valid book ID format, should be a number.");
 
             try {
+                Book book = BookManager.getBookById(id);
+                assert book != null;
                 if (this.modifyBookList(BookManager.getBookById(id), ModifyOperation.REMOVE))
-                    Library.println("\nBook successfully removed from the database.\n");
+                    Library.println("\nBook " + book.title() + " successfully removed from the database.\n");
             } catch (Exception e) {
                 Library.printError(e);
                 return false;

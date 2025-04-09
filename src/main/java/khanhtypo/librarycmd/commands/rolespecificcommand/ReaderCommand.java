@@ -134,7 +134,7 @@ public abstract class ReaderCommand implements IReaderCommand {
         public boolean onCalled(String[] parameters) {
             List<PrintedBook> borrowingBooks = super.listBooks(Library.activeUser.username());
             if (!borrowingBooks.isEmpty()) {
-                int idToReturn = super.readIntInput("ID of book to return: ",
+                int idToReturn = readIntInput("ID of book to return: ",
                         i -> borrowingBooks.stream().anyMatch(b -> b.getId() == i),
                         i -> "You haven't borrowed book with ID :" + i,
                         str -> "Format error. " + str + " is not a valid book ID.\n"
