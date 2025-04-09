@@ -13,7 +13,6 @@ import java.util.function.IntFunction;
 import java.util.function.IntPredicate;
 import java.util.function.UnaryOperator;
 
-//https://docs.google.com/document/d/1V2d08vE2CdQGKdXBJKMStnai4QePKCZCfZPHDBKMOx0
 public abstract class ReaderCommand implements IReaderCommand {
 
     /**
