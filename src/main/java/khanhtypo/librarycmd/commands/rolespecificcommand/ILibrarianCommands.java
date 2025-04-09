@@ -4,9 +4,7 @@ import de.vandermeer.asciitable.AsciiTable;
 import khanhtypo.librarycmd.Library;
 import khanhtypo.librarycmd.books.*;
 import khanhtypo.librarycmd.commands.CommandPermission;
-import khanhtypo.librarycmd.commands.DescriptiveParameters;
 import khanhtypo.librarycmd.commands.ICommand;
-import khanhtypo.librarycmd.commands.paramaters.CommandParam;
 import khanhtypo.librarycmd.util.ModifyOperation;
 import org.jspecify.annotations.Nullable;
 import org.msgpack.core.MessagePack;
@@ -96,7 +94,7 @@ public interface ILibrarianCommands extends ICommand {
                 String fileFormat = readInput("File Format", s -> "Invalid file format.", s -> true);
                 book = new EBook(title, author, genre, ISBN, BookStatus.AVAILABLE, null, fileFormat.replace('.', '\0'));
             } else {
-                int pages = Integer.parseInt(readInput("Page Count",  s -> "Pages count can not be 0 or lower.", s -> Integer.parseInt(s) > 0));
+                int pages = Integer.parseInt(readInput("Page Count", s -> "Pages count can not be 0 or lower.", s -> Integer.parseInt(s) > 0));
                 book = new PrintedBook(title, author, genre, ISBN, BookStatus.AVAILABLE, null, pages);
             }
 
@@ -125,19 +123,7 @@ public interface ILibrarianCommands extends ICommand {
 
     final class RemoveBookCommand implements ILibrarianCommands {
 
-        private final DescriptiveParameters parameters;
-
         public RemoveBookCommand() {
-            this.parameters = DescriptiveParameters.builder()
-                    .add(new CommandParam("id-number", "Remove the book by its id.", false).setPrefix("id"))
-                    .add(new CommandParam("book-title", "Remove the book information by its title.", false).setPrefix("title"))
-                    .add(new CommandParam("book-isbn", "Remove the book information by its ISBN.", false).setPrefix("isbn"))
-                    .build();
-        }
-
-        @Override
-        public DescriptiveParameters getParameters() {
-            return parameters;
         }
 
         @Override
@@ -201,20 +187,7 @@ public interface ILibrarianCommands extends ICommand {
     }
 
     final class ListBookCommand implements ILibrarianCommands {
-
-        private final DescriptiveParameters parameters;
-
         public ListBookCommand() {
-            this.parameters = DescriptiveParameters.builder()
-                    .add(new CommandParam("id-number", "Search and list the book information by its id.", false).setPrefix("id"))
-                    .add(new CommandParam("book-title", "Search and list the book information by its title.", false).setPrefix("title"))
-                    .add(new CommandParam("book-isbn", "Search and list the book information by its ISBN.", false).setPrefix("isbn"))
-                    .build();
-        }
-
-        @Override
-        public DescriptiveParameters getParameters() {
-            return parameters;
         }
 
         @Override
@@ -229,77 +202,35 @@ public interface ILibrarianCommands extends ICommand {
 
         @Override
         public boolean onCalled(String[] parameters) {
-            if (parameters.length == 0) {
-                List<Book> allBooks = BookManager.getAllBooks();
+            List<Book> allBooks = BookManager.getAllBooks();
 
-                //List all printed book
-                Library.println("All Printed Books: ");
-                AsciiTable printed = Library.createTableRenderer();
-                printed.addRule();
-                printed.addRow("ID", "Title", "Author", "Genre", "ISBN", "Pages", "Status", "Due Date");
-                printed.addRule();
-                allBooks.stream().filter(b -> b instanceof PrintedBook).map(b -> (PrintedBook) b).forEach(
-                        book -> {
-                            printed.addRow(book.getId(), book.title(), book.author(), book.genre(), book.ISBN(), book.getPages(), book.status(), book.dueDataString());
-                            printed.addRule();
-                        }
-                );
-                //printed.addRule();
-                Library.println(printed.render());
-                Library.println("\n All Digital Books: ");
-                //List all ebooks
-                AsciiTable ebook = Library.createTableRenderer();
-                ebook.addRule();
-                ebook.addRow("ID", "Title", "Author", "Genre", "ISBN", "Status", "File Format");
-                ebook.addRule();
-                allBooks.stream().filter(b -> b instanceof EBook).map(b -> (EBook) b).forEach(
-                        book -> {
-                            ebook.addRow(book.getId(), book.title(), book.author(), book.genre(), book.ISBN(), book.status(), book.getFileFormat());
-                            ebook.addRule();
-                        }
-                );
-                Library.println(ebook.render());
-            } else if (parameters.length == 1) {
-                Library.println("Unknown parameter: " + parameters[0]);
-            } else {
-                try {
-                    AsciiTable table = Library.createTableRenderer();
-                    String parameterKey = parameters[0];
-                    switch (parameterKey) {
-                        case "id" -> {
-                            if (parameters.length == 2) {
-                                int id = Integer.parseInt(parameters[1]);
-                                Book book = BookManager.getBookById(id);
-                                if (book == null) {
-                                    Library.println("Book ID not existed: " + id);
-                                    return true;
-                                }
-                                this.printSingletonTable(table, book);
-
-                            } else Library.println("Expected an numeric id input.");
-                        }
-                        case "title" -> {
-                            String title = String.join(" ", Arrays.copyOfRange(parameters, 1, parameters.length));
-                            Book foundBook = BookManager.getBookByTitle(title);
-                            if (foundBook != null) {
-                                this.printSingletonTable(table, foundBook);
-                            } else Library.println("No book with title " + title + " was found");
-                        }
-                        case "isbn" -> {
-                            if (parameters.length == 2) {
-                                Book book = BookManager.getBookByISBN(parameters[1]);
-                                if (book == null) {
-                                    Library.println("Book ISBN " + parameters[1] + " not found.");
-                                } else this.printSingletonTable(table, book);
-                            } else Library.println("Expected an numeric ISBN value.");
-                        }
-                        default -> Library.println("Unknown parameter key: " + parameterKey);
+            //List all printed book
+            Library.println("All Printed Books: ");
+            AsciiTable printed = Library.createTableRenderer();
+            printed.addRule();
+            printed.addRow("ID", "Title", "Author", "Genre", "ISBN", "Pages", "Status", "Due Date");
+            printed.addRule();
+            allBooks.stream().filter(b -> b instanceof PrintedBook).map(b -> (PrintedBook) b).forEach(
+                    book -> {
+                        printed.addRow(book.getId(), book.title(), book.author(), book.genre(), book.ISBN(), book.getPages(), book.status(), book.dueDataString());
+                        printed.addRule();
                     }
-                } catch (Exception e) {
-                    Library.printError(e);
-                    return false;
-                }
-            }
+            );
+            //printed.addRule();
+            Library.println(printed.render());
+            Library.println("\n All Digital Books: ");
+            //List all ebooks
+            AsciiTable ebook = Library.createTableRenderer();
+            ebook.addRule();
+            ebook.addRow("ID", "Title", "Author", "Genre", "ISBN", "Status", "File Format");
+            ebook.addRule();
+            allBooks.stream().filter(b -> b instanceof EBook).map(b -> (EBook) b).forEach(
+                    book -> {
+                        ebook.addRow(book.getId(), book.title(), book.author(), book.genre(), book.ISBN(), book.status(), book.getFileFormat());
+                        ebook.addRule();
+                    }
+            );
+            Library.println(ebook.render());
 
             return true;
         }
