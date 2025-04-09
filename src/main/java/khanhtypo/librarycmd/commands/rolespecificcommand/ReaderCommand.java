@@ -51,7 +51,7 @@ public abstract class ReaderCommand implements IReaderCommand {
 
     protected final int readIntInput(String field, IntPredicate validator, IntFunction<String> invalidMessage, UnaryOperator<String> formatErrorMessage) {
         while (true) {
-            Library.println(field);
+            Library.print(field);
             String input = Library.getInput();
             try {
                 int value = Integer.parseInt(input);
@@ -137,8 +137,8 @@ public abstract class ReaderCommand implements IReaderCommand {
             if (!borrowingBooks.isEmpty()) {
                 int idToReturn = super.readIntInput("ID of book to return: ",
                         i -> borrowingBooks.stream().anyMatch(b -> b.getId() == i),
-                        i -> "You haven't borrowed book with ID" + i,
-                        str -> "Format error. " + str + " is not a valid book ID."
+                        i -> "You haven't borrowed book with ID :" + i,
+                        str -> "Format error. " + str + " is not a valid book ID.\n"
                 );
                 borrowingBooks.stream().filter(b -> b.getId() == idToReturn).findFirst().ifPresent(Book::returnBook);
             }
