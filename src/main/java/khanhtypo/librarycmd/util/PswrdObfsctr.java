@@ -10,11 +10,11 @@ public final class PswrdObfsctr {
     }
 
     public static String encode(String plaintext) {
-        return internal_encode(new StringBuilder(internal_encode(plaintext)).reverse().toString());
+        return new StringBuilder(internal_encode(new StringBuilder(internal_encode(plaintext)).reverse().toString())).reverse().toString();
     }
 
     public static String decode(String encoded) {
-        return makeString(Base64.getDecoder().decode(new StringBuilder().append(makeString(Base64.getDecoder().decode(encoded))).reverse().toString()));
+        return makeString(Base64.getDecoder().decode(new StringBuilder().append(makeString(Base64.getDecoder().decode(new StringBuilder(encoded).reverse().toString()))).reverse().toString()));
     }
 
     private static String makeString(byte[] bytes) {

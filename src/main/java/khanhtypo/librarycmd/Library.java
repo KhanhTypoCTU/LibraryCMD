@@ -29,11 +29,13 @@ public class Library {
     private static String[] getInputs() {
         return Arrays.stream(scanner.nextLine().split(" ")).filter(string -> !string.isEmpty()).toArray(String[]::new);
     }
+
     public static AsciiTable createTableRenderer() {
         AsciiTable table = new AsciiTable().setTextAlignment(TextAlignment.CENTER);
         table.getContext().getGrid().addCharacterMap(TA_GridConfig.RULESET_NORMAL, '\0', '\u2500', '\u2502', '\u250C', '\u2510', '\u2514', '\u2518', '\u251C', '\u2524', '\u253C', '\u252C', '\u2534');
         return table;
     }
+
     public static String getInput() {
         return scanner.nextLine();
     }
