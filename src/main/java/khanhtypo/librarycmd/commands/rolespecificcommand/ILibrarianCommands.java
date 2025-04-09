@@ -138,50 +138,20 @@ public interface ILibrarianCommands extends ICommand {
 
         @Override
         public boolean onCalled(String[] parameters) {
+            ListBookCommand.listAllBooks();
 
-            if (parameters.length == 0) {
-                Library.println("Don't know what to remove ?");
-            } else if (parameters.length == 1) {
-                Library.println("Missing parameter value.");
-            } else {
-                try {
-                    String parameterKey = parameters[0];
-                    switch (parameterKey) {
-                        case "id" -> {
-                            if (parameters.length == 2) {
-                                int bookId = Integer.parseInt(parameters[1]);
-                                Book book = BookManager.getBookById(bookId);
-                                if (book != null) {
-                                    this.modifyBookList(book, ModifyOperation.REMOVE);
-                                } else {
-                                    Library.println("Book with id " + bookId + " not found.");
-                                    return true;
-                                }
-                            } else Library.println("Expected a numeric id.");
-                        }
-                        case "title" -> {
-                            String title = String.join(" ", Arrays.copyOfRange(parameters, 1, parameters.length));
-                            Book book = BookManager.getBookByTitle(title);
-                            if (book != null) {
-                                this.modifyBookList(book, ModifyOperation.REMOVE);
-                            } else Library.println("Book with title \"" + title + "\" not found.");
-                        }
-                        case "isbn" -> {
-                            if (parameters.length == 2) {
-                                Book book = BookManager.getBookByISBN(parameters[1]);
-                                if (book != null) {
-                                    this.modifyBookList(book, ModifyOperation.REMOVE);
-                                } else Library.println("Book with ISBN " + parameters[1] + " not found.");
-                            } else Library.println("Expecting a numeric ISBN value.");
-                        }
-                        default -> Library.println("Unknown parameter key: " + parameterKey);
-                    }
-                } catch (Exception e) {
-                    Library.printError(e);
-                    return false;
-                }
+            int id = ReaderCommand.readIntInput("ID of the book to be removed: ",
+                    i -> BookManager.getBookById(i) != null,
+                    i -> "Invalid book ID " + i,
+                    str -> "Your input is not a valid book ID format, should be a number.");
+
+            try {
+                if (this.modifyBookList(BookManager.getBookById(id), ModifyOperation.REMOVE))
+                    Library.println("\nBook successfully removed from the database.\n");
+            } catch (Exception e) {
+                Library.printError(e);
+                return false;
             }
-
             return true;
         }
     }
@@ -201,7 +171,12 @@ public interface ILibrarianCommands extends ICommand {
         }
 
         @Override
-        public boolean onCalled(String[] parameters) {
+        public boolean onCalled(String[] ignored) {
+            listAllBooks();
+            return true;
+        }
+
+        private static void listAllBooks() {
             List<Book> allBooks = BookManager.getAllBooks();
 
             //List all printed book
@@ -210,7 +185,7 @@ public interface ILibrarianCommands extends ICommand {
             printed.addRule();
             printed.addRow("ID", "Title", "Author", "Genre", "ISBN", "Pages", "Status", "Due Date");
             printed.addRule();
-            allBooks.stream().filter(b -> b instanceof PrintedBook).map(b -> (PrintedBook) b).forEach(
+            allBooks.stream().filter(Book::isPrintedBook).map(b -> (PrintedBook) b).forEach(
                     book -> {
                         printed.addRow(book.getId(), book.title(), book.author(), book.genre(), book.ISBN(), book.getPages(), book.status(), book.dueDataString());
                         printed.addRule();
@@ -224,15 +199,13 @@ public interface ILibrarianCommands extends ICommand {
             ebook.addRule();
             ebook.addRow("ID", "Title", "Author", "Genre", "ISBN", "Status", "File Format");
             ebook.addRule();
-            allBooks.stream().filter(b -> b instanceof EBook).map(b -> (EBook) b).forEach(
+            allBooks.stream().filter(Book::isEBook).map(b -> (EBook) b).forEach(
                     book -> {
                         ebook.addRow(book.getId(), book.title(), book.author(), book.genre(), book.ISBN(), book.status(), book.getFileFormat());
                         ebook.addRule();
                     }
             );
             Library.println(ebook.render());
-
-            return true;
         }
 
         private void printSingletonTable(AsciiTable table, Book book) {

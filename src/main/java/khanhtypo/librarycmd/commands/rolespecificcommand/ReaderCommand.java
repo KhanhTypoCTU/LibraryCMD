@@ -48,7 +48,7 @@ public abstract class ReaderCommand implements IReaderCommand {
         }
     }
 
-    protected final int readIntInput(String field, IntPredicate validator, IntFunction<String> invalidMessage, UnaryOperator<String> formatErrorMessage) {
+    static  int readIntInput(String field, IntPredicate validator, IntFunction<String> invalidMessage, UnaryOperator<String> formatErrorMessage) {
         while (true) {
             Library.print(field);
             String input = Library.getInput();
