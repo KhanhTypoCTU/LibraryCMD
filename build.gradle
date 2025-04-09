@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version '9.0.0-beta12'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.msgpack:msgpack-core:0.9.9'
+    implementation 'com.google.guava:guava:33.4.6-jre'
+    implementation 'de.vandermeer:asciitable:0.3.2'
+    //implementation 'it.unimi.dsi:fastutil:8.5.15'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    manifest {
+        attributes (
+                'Main-Class' : 'khanhtypo.librarycmd.Library'
+        )
+    }
+}
